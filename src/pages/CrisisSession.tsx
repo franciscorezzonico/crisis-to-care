@@ -14,6 +14,141 @@ export default function CrisisSession() {
   const [breathState, setBreathState] = useState<'In' | 'Hold' | 'Out'>('In');
   const [breathCount, setBreathCount] = useState(0);
 
+  const [specificIssue, setSpecificIssue] = useState('');
+
+  const counselingContent: Record<
+    string,
+    {
+      intro: string;
+      options: string[];
+      followUps: Record<string, string>;
+    }
+
+  > = {
+    'Panic/Anxiety': {
+      intro: 
+        "It makes sense that your body and mind are on high alert. Panic and anxiety can feel overwhelming, especially when you also have school, work, or family on your plate. You're not weak for feeling this way.",
+      options: [
+        'Panic attacks during or before class',
+        'Constant worrying about grades or the future',
+        'Physical symptoms (racing heart, shortness of breath, nausea)',
+        'Feeling on edge without knowing why',
+      ],
+      followUps: {
+        'Panic attacks during or before class':
+          'Panic before class is very common, especially when you’re carrying a lot of pressure. One step could be talking with a counselor or professor about what class environments feel hardest. Practicing grounding before and after class, plus having a “safe person” you can text, can help you feel less alone with it.',
+        'Constant worrying about grades or the future':
+          'When you are first-gen, it can feel like every grade is tied to your whole future. It might help to talk with an academic advisor or counselor about how much one class or semester really affects your path, and to build small, realistic plans instead of holding everything in your head alone.',
+        'Physical symptoms (racing heart, shortness of breath, nausea)':
+          'Those physical symptoms are your nervous system trying to protect you, even if it fires at the wrong times. Slow breathing exercises, grounding, and learning what tends to trigger your body can all help. A counselor or medical provider can also help you understand what is happening physically.',
+        'Feeling on edge without knowing why':
+          "Feeling on edge without a clear reason is still valid. For a lot of students, especially first-gen students, there are many small stressors stacking up. It may help to write down when you feel that edge the most and bring that to a counselor or trusted person to look for patterns together.",
+      },
+    },
+    'Loneliness': {
+      intro: 
+        "Feeling lonely on campus is incredibly common, especially if you’re the first in your family to navigate college. It doesn’t mean you don’t belong here.",
+      options: [
+        'Missing family / home',
+        'Hard to make friends on campus',
+        'Feeling different from others here',
+      ],
+      followUps: {
+        'Missing family / home':
+          'Missing home can be really intense, especially during your first semesters. Staying connected by regular calls or messages can help, but it can also help to create small routines on campus that feel “yours”—like a study spot, club, or weekly event that grounds you here too.',
+        'Hard to make friends on campus':
+          'Making friends in college often takes longer than people admit. You may find it easier in smaller spaces like study groups, identity-based orgs, or first-gen programs. A counselor or mentor can also help you plan small, low-pressure ways to meet people.',
+        'Feeling different from others here':
+          'Feeling like you don’t fit the “typical student” image is a very real experience. Many first-gen and marginalized students feel this. Connecting with first-gen student groups, cultural centers, or mentors who share parts of your background can help you feel less alone.',
+      },
+    },
+    'Academic Pressure': {
+      intro:
+        "Academic pressure can feel like everything is on the line, especially when you’re carrying your family’s hopes or financial realities. That pressure is heavy, not a personal failure.",
+      options: [
+        'Falling behind in one or more classes',
+        'Perfectionism / fear of any mistake',
+        'Balancing school with work or caregiving',
+      ],
+      followUps: {
+        'Falling behind in one or more classes':
+          'Falling behind happens to many students, even if people don’t talk about it. An important step can be emailing or meeting with your professor or academic advisor to get clear on what’s realistic. You do not have to figure out a catch-up plan alone.',
+        'Perfectionism / fear of any mistake':
+          'Perfectionism can protect you in some ways, but it also makes every assignment feel like a threat. You might experiment with “good enough” on one or two lower-stakes tasks, and talk with a counselor about where that fear of mistakes comes from and how to loosen its grip a bit.',
+        'Balancing school with work or caregiving':
+          'Balancing school with work or caregiving is an enormous load, and most systems were not built with that in mind. You may be eligible for support through financial aid, disability services, or flexible arrangements with instructors. Talking this through with a counselor or case manager could open options you haven’t been told about.',
+      },
+    },
+    'Financial Stress': {
+      intro:
+        "Financial stress can make everything else feel unstable. Worrying about money is not a personal failing; it’s a response to very real pressure.",
+      options: [
+        'Worried about paying tuition / staying enrolled',
+        'Struggling with day-to-day expenses (food, housing)',
+        'Sending money home while in school',
+      ],
+      followUps: {
+        'Worried about paying tuition / staying enrolled':
+          'If you’re worried about staying enrolled, you’re not alone. A financial aid counselor or student services office may have options you haven’t been told about yet, like payment plans, emergency grants, or different enrollment choices. It can help to schedule a meeting and bring your questions.',
+        'Struggling with day-to-day expenses (food, housing)':
+          'Day-to-day expenses like food and housing deeply affect your mental health. Many campuses have food pantries, emergency funds, or housing support programs. A counselor, case manager, or first-gen program staff can help connect you to those resources and advocate with you.',
+        'Sending money home while in school':
+          'Supporting family while in school is an act of care, but it’s also a lot for one person to hold. Talking with a counselor or trusted mentor about this role can help you think through boundaries, options, and ways to care for yourself alongside your family.',
+      },
+    },
+    'Family Issues': {
+      intro: 
+        "Family stress can be complicated—especially when you’re trying to honor your family and also build your own path. It’s understandable if you feel pulled in different directions.",
+      options: [
+        'Conflict at home about school choices',
+        'Feeling responsible for family problems',
+        "Family doesn't understand mental health / counseling",
+      ],
+      followUps: {
+        'Conflict at home about school choices':
+          'Disagreements with family about your path can be painful. A counselor or mentor can help you think about how to communicate what this path means to you, and how to set boundaries while still honoring your relationships.',
+        'Feeling responsible for family problems':
+          'Feeling responsible for family problems is heavy. You didn’t create those problems, and you don’t have to solve them alone. A counselor can help you sort what is truly yours to carry and what might need other forms of support.',
+        "Family doesn't understand mental health / counseling":
+          'Many families, especially in first-gen communities, have not had good information about counseling. Talking with a counselor yourself can help you decide what feels right for you, even if your family doesn’t fully understand yet.',
+      },
+    },
+    'Discrimination': {
+      intro:
+        "Experiencing discrimination, bias, or microaggressions is not your fault. It can wear you down over time, especially when you’re already carrying a lot.",
+      options: [
+        'Bias or microaggressions from peers',
+        'Bias or unfairness from faculty/staff',
+        'Feeling unsafe in certain campus spaces',
+      ],
+      followUps: {
+        'Bias or microaggressions from peers':
+          'Microaggressions from peers can make campus feel less safe. You might talk with a counselor, cultural center, or identity-based org about what you’re experiencing, and explore options for support, reporting, or collective care.',
+        'Bias or unfairness from faculty/staff':
+          'When bias or unfairness comes from someone in power, it can be very destabilizing. It may help to document what happened and talk with an advocate (such as an ombuds office, cultural center, or trusted staff member) about possible next steps—at your pace.',
+        'Feeling unsafe in certain campus spaces':
+          'Feeling unsafe in certain spaces matters, even if others don’t see it. Together with a counselor, cultural center, or trusted staff member, you could map out safer routes and spaces, and talk about whether any formal reports or additional protections make sense for you.',
+      },
+    },
+    'Unsure': {
+      intro:
+        "It’s okay not to know exactly what’s wrong. Sometimes things just feel heavy without a clear label, especially when a lot is happening at once.",
+      options: [
+        'It feels like "everything" at once',
+        'I feel numb or disconnected',
+        "I'm not sure, but I know I'm not okay",
+      ],
+      followUps: {
+        'It feels like "everything" at once':
+          'When everything hits at once, your brain and body can feel flooded. It might help to slowly list what’s on your plate with a counselor or trusted person so you’re not carrying it all alone in your head.',
+        'I feel numb or disconnected':
+          'Feeling numb or disconnected can be your mind’s way of protecting you. Gentle activities that reconnect you with your body, senses, or trusted people can help, and a counselor can give you a safe space to explore why this might be happening.',
+        "I'm not sure, but I know I'm not okay":
+          'Knowing “I’m not okay” is already important information. A counselor or campus support person can help you sort out what’s going on, even if you don’t have the words yet.',
+      },
+    },
+  };
+
   useEffect(() => {
     if (step === 3) {
       const interval = setInterval(() => {
@@ -212,13 +347,76 @@ export default function CrisisSession() {
             </div>
 
             <button onClick={handleNext} className="w-full py-5 bg-earth-sage text-white rounded-2xl font-bold text-xl hover:shadow-xl transition-all">
-              Continue to Action Plan
+              Continue to Counselor Refelction
             </button>
           </motion.div>
         );
       case 5:
         return (
-          <motion.div key="step5" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 py-8">
+          <motion.div key="step5" initial={{ opacity: 0, y: 20 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y: -20}} className="space-y-8 py-8">
+            <div className="space-y-4 text-center">
+              <h2 className="text-3xl font-serif font-bold text-earth-charcoal">
+                {stressor
+                  ? `Let’s look a bit closer at your ${stressor.toLowerCase()}`
+                  : "Let’s look a bit closer at what’s going on"}
+              </h2>
+              <p className="text-earth-charcoal/70">
+                {stressor && counselingContent[stressor]
+                  ? counselingContent[stressor].intro
+                  : "It’s okay if you’re not sure how to describe it yet. We’ll take it one small step at a time."}
+              </p>
+            </div>
+
+            {stressor && counselingContent[stressor] && (
+              <div className="space-y-4 bg-white p-8 rounded-[2rem] border border-earth-sand/20 shadow-sm">
+                <h3 className="font-bold text-earth-sage uppercase tracking-widest text-xs ml-1">
+                  Let’s get a bit more specific
+                </h3>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {counselingContent[stressor].options.map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => setSpecificIssue(opt)}
+                      className={`p-4 text-left rounded-2xl border font-bold text-sm transition-all ${
+                        specificIssue === opt
+                          ? 'bg-earth-sage text-white border-earth-sage shadow-lg shadow-earth-sage/20'
+                          : 'bg-white border-earth-sand/20 text-earth-charcoal hover:border-earth-sage'
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Tailored follow-up based on specific issue */}
+            {stressor &&
+              specificIssue &&
+              counselingContent[stressor] &&
+              counselingContent[stressor].followUps[specificIssue] && (
+                <div className="space-y-4 bg-white p-8 rounded-[2rem] border border-earth-sand/20 shadow-sm">
+                  <h3 className="font-bold text-earth-sage uppercase tracking-widest text-xs ml-1">
+                    A counselor might say:
+                  </h3>
+                  <p className="text-earth-charcoal/80 leading-relaxed">
+                    {counselingContent[stressor].followUps[specificIssue]}
+                  </p>
+                </div>
+              )}
+
+            <button
+              onClick={handleNext}
+              disabled={!specificIssue}
+              className="w-full py-5 bg-earth-charcoal text-white rounded-2xl font-bold text-xl hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Continue to Action Plan
+            </button>
+          </motion.div>
+        );
+      case 6:
+        return (
+          <motion.div key="step6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 py-8">
             <div className="space-y-4 text-center">
               <h2 className="text-3xl font-serif font-bold text-earth-charcoal font-serif">{t.crisis.planTitle}</h2>
               <p className="text-earth-charcoal/70">{t.crisis.planSub}</p>
@@ -256,9 +454,9 @@ export default function CrisisSession() {
             </button>
           </motion.div>
         );
-      case 6:
+      case 7:
         return (
-          <motion.div key="step6" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-8 py-12 text-center">
+          <motion.div key="step7" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-8 py-12 text-center">
             <div className="w-20 h-20 bg-earth-terracotta/10 text-earth-terracotta rounded-full flex items-center justify-center mx-auto mb-6">
               <Heart className="w-10 h-10 fill-earth-terracotta" />
             </div>
