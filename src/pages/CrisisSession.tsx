@@ -4,9 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, AlertTriangle, ArrowRight, CheckCircle2, MessageSquare, Heart, Wind, Eye, Hand, Ear } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useMessages, Counselor } from '../contexts/MessagesContext';
 
 export default function CrisisSession() {
   const { t } = useLanguage();
+  const { startConversation } = useMessages();
   const [step, setStep] = useState(1);
   const [intensity, setIntensity] = useState(5);
   const [stressor, setStressor] = useState('');
@@ -15,6 +17,8 @@ export default function CrisisSession() {
   const [breathCount, setBreathCount] = useState(0);
 
   const [specificIssue, setSpecificIssue] = useState('');
+  const [selectedCounselorId, setSelectedCounselorId] = useState<string>('');
+  const [anonMessage, setAnonMessage] = useState('');
 
   const counselingContent: Record<
     string,
@@ -148,6 +152,41 @@ export default function CrisisSession() {
       },
     },
   };
+
+  const counselors: Counselor[] = [
+    {
+      id: 'camila',
+      name: 'Camila Reyes',
+      role: 'Campus counselor, first-gen Latina',
+      background:
+        'First-gen college graduate from a rural community. Navigated transfer from community college, worked campus jobs, and supported family at the same time. Passionate about helping students balance family expectations and their own goals.',
+      isFirstGen: true,
+    },
+    {
+      id: 'devon',
+      name: 'Devon Miller',
+      role: 'Peer counselor, STEM student',
+      background:
+        'Queer, first-gen engineering student who struggled with imposter feelings and academic probation. Active in campus LGBTQ+ and first-gen programs.',
+      isFirstGen: true,
+    },
+    {
+      id: 'amina',
+      name: 'Amina Hassan',
+      role: 'Counseling intern, immigrant background',
+      background:
+        'Moved to the U.S. as a teenager and was first in her family to attend college. Balances her own cultural expectations with mental health advocacy on campus.',
+        isFirstGen: true,
+    },
+    {
+      id: 'jorge',
+      name: 'Jorge Alvarez',
+      role: 'Staff counselor, men of color initiative',
+      background:
+        'First-gen college grad who was a commuter student working nights. Focuses on supporting men of color who feel pressure to "be strong" and not show emotion.',
+        isFirstGen: true,
+    },
+  ];
 
   useEffect(() => {
     if (step === 3) {
@@ -416,7 +455,83 @@ export default function CrisisSession() {
         );
       case 6:
         return (
-          <motion.div key="step6" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 py-8">
+          <motion.div key="step6" initial={{ opacity: 0, y:20 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-20 }} className="space-y-8 py-8">
+            <div className="space-y-4 text-center">
+              <h2 className="text-3xl font-serif font-bold text-earth-charcoal">
+                Talk anonymously to a counselor (prototype)
+              </h2>
+              <p className="text-earth-charcoal/70 text-sm">
+                This is a practice space to imagine what it might feel like to send an anonymous note
+                to a counselor or peer support person. It does not connect to real counselors.
+              </p>
+            </div>
+
+            <div className="space-y-4 bg-white p-8 rounded-[2rem] border border-earth-sand/20 shadow-sm">
+              <h3 className="font-bold text-earth-sage uppercase tracking-widest text-xs ml-1">
+                Choose who you’d like to write to
+              </h3>
+              <div className="space-y-3">
+                {counselors.map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => setSelectedCounselorId(c.id)}
+                    className={`w-full text-left p-4 rounded-2xl border transition-all ${
+                      selectedCounselorId === c.id
+                        ? 'bg-earth-sage text-white border-earth-sage shadow-lg shadow-earth-sage/20'
+                        : 'bg-white border-earth-sand/20 text-earth-charcoal hover:border-earth-sage'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="font-bold">{c.name}</span>
+                      {c.isFirstGen && (
+                        <span className="text-[10px] font-semibold uppercase bg-white/20 px-2 py-0.5 rounded-full">
+                          First-gen
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-current/80">{c.role}</p>
+                    <p className="mt-1 text-xs text-current/70">{c.background}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4 bg-white p-8 rounded-[2rem] border border-earth-sand/20 shadow-sm">
+              <h3 className="font-bold text-earth-sage uppercase tracking-widest text-xs ml-1">
+                Write them an anonymous note
+              </h3>
+              <p className="text-earth-charcoal/70 text-sm">
+                You can share what’s been hardest and what you hope for. No names, no IDs—just your words.
+              </p>
+              <textarea
+                className="w-full min-h-[120px] border border-earth-sand/40 rounded-2xl px-3 py-2 text-sm"
+                placeholder="What would you want this person to know about what you’re carrying right now?"
+                value={anonMessage}
+                onChange={(e) => setAnonMessage(e.target.value)}
+              />
+            </div>
+
+            <button
+              onClick={() => {
+                const counselor = counselors.find((c) => c.id === selectedCounselorId);
+                const text = anonMessage.trim();
+                if (!counselor || !text) return;
+                // Start a mock conversation and store the first message
+                startConversation(counselor, text);
+                setAnonMessage('');
+                // Move on to the next step (action plan)
+                handleNext();
+              }}
+              disabled={!selectedCounselorId || !anonMessage.trim()}
+              className="w-full py-5 bg-earth-sage text-white rounded-2xl font-bold text-xl hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Send note and continue to Action Plan
+            </button>
+          </motion.div>
+        );
+      case 7:
+        return (
+          <motion.div key="step7" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 py-8">
             <div className="space-y-4 text-center">
               <h2 className="text-3xl font-serif font-bold text-earth-charcoal font-serif">{t.crisis.planTitle}</h2>
               <p className="text-earth-charcoal/70">{t.crisis.planSub}</p>
@@ -454,9 +569,9 @@ export default function CrisisSession() {
             </button>
           </motion.div>
         );
-      case 7:
+      case 8:
         return (
-          <motion.div key="step7" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-8 py-12 text-center">
+          <motion.div key="step8" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-8 py-12 text-center">
             <div className="w-20 h-20 bg-earth-terracotta/10 text-earth-terracotta rounded-full flex items-center justify-center mx-auto mb-6">
               <Heart className="w-10 h-10 fill-earth-terracotta" />
             </div>
