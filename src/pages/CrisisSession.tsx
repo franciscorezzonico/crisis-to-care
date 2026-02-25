@@ -347,7 +347,7 @@ export default function CrisisSession() {
             </div>
 
             <button onClick={handleNext} className="w-full py-5 bg-earth-sage text-white rounded-2xl font-bold text-xl hover:shadow-xl transition-all">
-              Continue to Counselor Refelction
+              Continue to Counselor Reflection
             </button>
           </motion.div>
         );
