@@ -449,7 +449,7 @@ export default function CrisisSession() {
               disabled={!specificIssue}
               className="w-full py-5 bg-earth-charcoal text-white rounded-2xl font-bold text-xl hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Continue to Action Plan
+              Send anonymous note to a campus counselor
             </button>
           </motion.div>
         );
