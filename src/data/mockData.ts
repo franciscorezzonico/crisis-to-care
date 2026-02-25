@@ -162,7 +162,7 @@ export const NAVIGATOR_PATHWAYS = {
         who: 'Any AU student needing academic support',
         expect: 'Schedule online via WC Online; bring your assignment prompt.',
         location: 'Bender Library, 1st Floor',
-        link: 'https://www.american.edu/provost/academic-access/writing-center.cfm'
+        link: 'https://www.american.edu/provost/eagle-learning-center/writing-center/'
       }
     ]
   },
@@ -186,7 +186,7 @@ export const NAVIGATOR_PATHWAYS = {
         expect: 'Drop-in hours for quick questions; appointments for complex visa/employment matters.',
         emailTemplate: "Subject: Question about Visa/Status - [Your Name]\n\nDear ISSS Advisor,\n\nI have a question regarding my status and would like to schedule an appointment. Thank you for your help.\n\nBest regards,\n[Your Name]",
         location: 'Bender Library, Suite 410',
-        link: 'https://www.american.edu/isss/'
+        link: 'https://www.american.edu/student-affairs/isss/'
       }
     ]
   }
