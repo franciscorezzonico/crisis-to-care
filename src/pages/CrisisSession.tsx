@@ -458,7 +458,7 @@ export default function CrisisSession() {
           <motion.div key="step6" initial={{ opacity: 0, y:20 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0, y:-20 }} className="space-y-8 py-8">
             <div className="space-y-4 text-center">
               <h2 className="text-3xl font-serif font-bold text-earth-charcoal">
-                Talk anonymously to a counselor (prototype)
+                Talk anonymously to a counselor
               </h2>
               <p className="text-earth-charcoal/70 text-sm">
                 This is a practice space to imagine what it might feel like to send an anonymous note
