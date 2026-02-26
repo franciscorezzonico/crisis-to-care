@@ -13,6 +13,12 @@ interface Post {
   category: string;
   reactions: number;
   openToConnect: boolean;
+  replies?: {
+    id: string;
+    author: string;
+    content: string;
+    createdAt: string;
+  }[];
 }
 
 export default function Community() {
@@ -24,6 +30,15 @@ export default function Community() {
   const [openToConnect, setOpenToConnect] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
+
+  const [activeConnectPost, setActiveConnectPost] = useState<null | {
+    id: string;
+    author: string;
+  }>(null);
+  const [connectMessage, setConnectMessage] = useState('');
+
+  const [replyingToPostId, setReplyingToPostId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
 
   useEffect(() => {
     const savedPosts = localStorage.getItem('c2c_posts');
@@ -194,7 +209,79 @@ export default function Community() {
                 </span>
               </div>
 
-              <p className="text-earth-charcoal/80 text-lg leading-relaxed font-sans">{post.content}</p>
+              <p className="text-earth-charcoal/80 text-lg leading-relaxed font-sans">
+                {post.content}
+              </p>
+
+              {post.replies && post.replies.length > 0 && (
+                <div className="mt-4 space-y-2 border-t border-earth-sand/15 pt-3">
+                  {post.replies.map((reply) => (
+                    <div
+                      key={reply.id}
+                      className="rounded-2xl bg-earth-cream/40 px-4 py-3"
+                    >
+                      <p className="text-[11px] font-bold text-earth-charcoal/70 uppercase tracking-wide">
+                        Another first-gen student
+                      </p>
+                      <p className="mt-1 text-xs text-earth-charcoal/80 leading-snug">
+                        {reply.content}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {replyingToPostId === post.id && (
+                <div className="mt-4 border-t border-earth-sand/15 pt-3 space-y-2">
+                  <textarea
+                    className="w-full rounded-2xl border border-earth-sand/30 bg-earth-cream/20 p-3 text-xs focus:ring-2 focus:ring-earth-sage focus:border-earth-sage outline-none"
+                    rows={3}
+                    placeholder="Share encouragement, a similar experience, or a resource."
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                  />
+                  <div className="flex justify-end gap-2">
+                    <button
+                      onClick={() => {
+                        setReplyingToPostId(null);
+                        setReplyText('');
+                      }}
+                      className="px-3 py-1.5 text-[11px] font-bold rounded-full border border-earth-sand/40 text-earth-charcoal/70 hover:bg-earth-cream/60 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      disabled={!replyText.trim()}
+                      onClick={() => {
+                        const trimmed = replyText.trim();
+                        setPosts((prev) =>
+                          prev.map((p) =>
+                            p.id === post.id
+                              ? {
+                                ...p,
+                                replies: [
+                                  ...(p.replies ?? []),
+                                  {
+                                    id: crypto.randomUUID(),
+                                    author: 'Another first-gen student',
+                                    content: trimmed,
+                                    createdAt: new Date().toISOString(),
+                                  },
+                                ],
+                              }
+                            : p,
+                          ),
+                        );
+                        setReplyingToPostId(null);
+                        setReplyText('');
+                      }}
+                      className="px-4 py-1.5 text-[11px] font-bold rounded-full bg-earth-sage text-white hover:bg-earth-sage/95 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Post reply
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="flex items-center justify-between pt-4 border-t border-earth-sand/10">
                 <button
@@ -202,24 +289,105 @@ export default function Community() {
                   className="flex items-center gap-2 group transition-all"
                 >
                   <div className="w-10 h-10 rounded-full bg-earth-terracotta/5 flex items-center justify-center group-hover:bg-earth-terracotta/10 transition-colors">
-                    <Heart className={`w-5 h-5 transition-transform group-active:scale-150 ${post.reactions > 0 ? 'fill-earth-terracotta text-earth-terracotta' : 'text-earth-charcoal/40'}`} />
+                    <Heart
+                      className={`w-5 h-5 transition-transform group-active:scale-150 ${
+                        post.reactions > 0
+                          ? 'fill-earth-terracotta text-earth-terracotta'
+                          : 'text-earth-charcoal/40'
+                      }`}
+                    />
                   </div>
-                  <span className={`font-bold text-sm ${post.reactions > 0 ? 'text-earth-terracotta' : 'text-earth-charcoal/60'}`}>
+                  <span
+                    className={`font-bold text-sm ${
+                      post.reactions > 0
+                        ? 'text-earth-terracotta'
+                        : 'text-earth-charcoal/60'
+                    }`}
+                  >
                     {post.reactions}
                   </span>
                 </button>
 
-                {post.openToConnect && (
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-earth-sage/5 text-earth-sage hover:bg-earth-sage/10 transition-all font-bold text-xs uppercase tracking-wider">
-                    <MessageCircle className="w-4 h-4" />
-                    Connect
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      setReplyingToPostId(
+                        replyingToPostId === post.id ? null : post.id,
+                      );
+                      setReplyText('');
+                    }}
+                    className="flex items-center gap-1 text-[11px] font-bold text-earth-charcoal/60 hover:text-earth-charcoal/90 uppercase tracking-wider"
+                  >
+                    <MessageCircle className="w-3 h-3" />
+                    Reply
                   </button>
-                )}
+
+                  {post.openToConnect && (
+                    <button
+                      onClick={() =>
+                        setActiveConnectPost({ id: post.id, author: post.author })
+                      }
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-earth-sage/5 text-earth-sage hover:bg-earth-sage/10 transition-all font-bold text-xs uppercase tracking-wider"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      Connect
+                    </button>
+                  )}
+                </div>
               </div>
+
+              
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
+
+      {activeConnectPost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-full max-w-md rounded-[2rem] bg-white p-6 shadow-lg border border-earth-sand/30">
+            <h3 className="text-base font-bold text-earth-charcoal">
+              Send an anonymous note to {activeConnectPost.author}
+            </h3>
+            <p className="mt-1 text-xs text-earth-charcoal/60">
+              Your name and email are not shown. This is an anonymous message to another first-gen student.
+            </p>
+            <textarea
+              className="mt-3 w-full rounded-2xl border border-earth-sand/30 bg-earth-cream/20 p-3 text-sm focus:ring-2 focus:ring-earth-sage focus:border-earth-sage outline-none"
+              rows={4}
+              placeholder="What would you like to share with this student?"
+              value={connectMessage}
+              onChange={(e) => setConnectMessage(e.target.value)}
+            />
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setConnectMessage('');
+                  setActiveConnectPost(null);
+                }}
+                className="px-3 py-2 text-xs font-bold rounded-full border border-earth-sand/40 text-earth-charcoal/70 hover:bg-earth-cream/60 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    console.log('Send anonymous message', {
+                      toPostId: activeConnectPost.id,
+                      toAuthor: activeConnectPost.author,
+                      message: connectMessage.trim(),
+                    });
+                    setConnectMessage('');
+                    setActiveConnectPost(null);
+                  }}
+                  disabled={!connectMessage.trim()}
+                  className="px-4 py-2 text-xs font-bold rounded-full bg-earth-sage text-white hover:bg-earth-sage/95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <Send className="w-3 h-3" />
+                  Send anonymous message
+                </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
